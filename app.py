@@ -19,7 +19,7 @@ historial = []
 html_template = """
 <html>
 <head>
-<title>Monitor Climatico de Fer 9D</title>
+<title>Meteo_San_Jose</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta http-equiv='refresh' content='300'>
 <style>
@@ -34,11 +34,11 @@ canvas { max-width: 100%; margin: 20px auto; }
 </head>
 <body>
   <div class='header'>
-    <div class='mini-card'>San Miguel de Tucumán</div>
+    <div class='mini-card'>San Jose, US</div>
     <div class='mini-card'>{{ fecha }}</div>
   </div>
 
-  <h1>Monitor Climatico de Fer 9D</h1>
+  <h1>Meteo_San_Jose</h1>
 
   <div class='card'><div class='dato'>Temperatura: {{ temperatura }} &#8451;</div></div>
   <div class='card'><div class='dato'>Humedad: {{ humedad }} %</div></div>
@@ -169,7 +169,7 @@ def home():
 
 @app.route("/update", methods=["POST"])
 def update():
-    argentina = pytz.timezone('America/Argentina/Buenos_Aires')
+    USA = pytz.timezone('America/USA/San Jose/CA')
     datos["fecha"] = datetime.now(argentina).strftime("%d/%m/%Y %H:%M")
 
     try:
