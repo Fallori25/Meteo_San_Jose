@@ -1,6 +1,8 @@
 from flask import Flask, request, render_template_string, jsonify
 from datetime import datetime
 import pytz
+import requests
+import os
 
 app = Flask(__name__)
 
@@ -12,10 +14,13 @@ datos = {
     "fecha": "-"
 }
 
-# Historial (últimos 10)
+# Historial (últimos 36 para 3 horas cada 5 minutos)
 historial = []
 
-# HTML con 3 gráficos separados
+# Coordenadas de San José, California
+lat = 37.3382
+lon = -121.8863
+
 html_template = """
 <html>
 <head>
@@ -54,18 +59,12 @@ canvas { max-width: 100%; margin: 20px auto; }
   <canvas id="graficoPres"></canvas>
 
  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-
- <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-
 <script>
   let gTemp, gHum, gPres;
-
   function cargarGraficos() {
     fetch('/api/datos')
       .then(r => r.json())
       .then(data => {
-
-        // Temperatura
         if (!gTemp) {
           gTemp = new Chart(document.getElementById('graficoTemp').getContext('2d'), {
             type: 'line',
@@ -79,13 +78,7 @@ canvas { max-width: 100%; margin: 20px auto; }
                 tension: 0.4
               }]
             },
-            options: {
-              responsive: true,
-              scales: {
-                x: { display: true },
-                y: { display: true }
-              }
-            }
+            options: { responsive: true, scales: { x: { display: true }, y: { display: true } } }
           });
         } else {
           gTemp.data.labels = data.labels;
@@ -93,7 +86,6 @@ canvas { max-width: 100%; margin: 20px auto; }
           gTemp.update();
         }
 
-        // Humedad
         if (!gHum) {
           gHum = new Chart(document.getElementById('graficoHum').getContext('2d'), {
             type: 'line',
@@ -107,13 +99,7 @@ canvas { max-width: 100%; margin: 20px auto; }
                 tension: 0.4
               }]
             },
-            options: {
-              responsive: true,
-              scales: {
-                x: { display: true },
-                y: { display: true }
-              }
-            }
+            options: { responsive: true, scales: { x: { display: true }, y: { display: true } } }
           });
         } else {
           gHum.data.labels = data.labels;
@@ -121,7 +107,6 @@ canvas { max-width: 100%; margin: 20px auto; }
           gHum.update();
         }
 
-        // Presión
         if (!gPres) {
           gPres = new Chart(document.getElementById('graficoPres').getContext('2d'), {
             type: 'line',
@@ -135,13 +120,7 @@ canvas { max-width: 100%; margin: 20px auto; }
                 tension: 0.4
               }]
             },
-            options: {
-              responsive: true,
-              scales: {
-                x: { display: true },
-                y: { display: true }
-              }
-            }
+            options: { responsive: true, scales: { x: { display: true }, y: { display: true } } }
           });
         } else {
           gPres.data.labels = data.labels;
@@ -150,11 +129,9 @@ canvas { max-width: 100%; margin: 20px auto; }
         }
       });
   }
-
   cargarGraficos();
   setInterval(cargarGraficos, 300000);
 </script>
-
 </body>
 </html>
 """
@@ -169,9 +146,8 @@ def home():
 
 @app.route("/update", methods=["POST"])
 def update():
-    USA = pytz.timezone('America/USA/San Jose/CA')
-    datos["fecha"] = datetime.now(argentina).strftime("%d/%m/%Y %H:%M")
-
+    usa = pytz.timezone('America/Los_Angeles')
+    datos["fecha"] = datetime.now(usa).strftime("%d/%m/%Y %H:%M")
     try:
         temperatura = float(request.form.get("temperatura", "-"))
         humedad = float(request.form.get("humedad", "-"))
@@ -182,7 +158,7 @@ def update():
         datos["presion"] = f"{presion:.1f}"
 
         registro = {
-            "hora": datetime.now(argentina).strftime("%H:%M"),
+            "hora": datetime.now(usa).strftime("%H:%M"),
             "temperatura": temperatura,
             "humedad": humedad,
             "presion": presion
@@ -210,7 +186,8 @@ def api_datos():
     })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 
 
