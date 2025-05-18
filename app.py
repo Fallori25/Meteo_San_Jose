@@ -39,9 +39,10 @@ canvas { max-width: 100%; margin: 20px auto; }
 </head>
 <body>
   <div class='header'>
-    <div class='mini-card'>San Jose, US</div>
-    <div class='mini-card'><span id="reloj">--:--:--</span></div>
-  </div>
+  <div class='mini-card'>San Jose, US</div>
+  <div class='mini-card'>{{ fecha }}</div>
+  <div class='mini-card'><span id="reloj">--:--:--</span></div>
+</div>
 
   <h1>Meteo_San_Jose</h1>
 
