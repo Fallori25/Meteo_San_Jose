@@ -24,27 +24,28 @@ lon = -121.8863
 html_template = """
 <html>
 <head>
-<title>El Tiempo en San Jose</title>
+<title>El tiempo en San Jose</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta http-equiv='refresh' content='300'>
 <style>
 body { font-family: Arial, sans-serif; background-color: #FFB6C1; text-align: center; padding: 20px; margin: 0; }
 .header { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
 .mini-card { background-color: red; color: white; padding: 10px 15px; border-radius: 10px; font-size: 1em; font-weight: bold; }
-h1 { color: #2c3e50; font-size: 2em; margin: 0; }
+h1 { color: #2c3e50; font-size: 2.2em; margin-bottom: 10px; }
 .card { background: linear-gradient(135deg, #00CED1, #c7ecee); padding: 15px; margin: 15px auto; border-radius: 20px; max-width: 400px; box-shadow: 0px 4px 20px rgba(0,0,0,0.1); }
 .dato { font-size: 2em; font-weight: bold; }
 canvas { max-width: 100%; margin: 20px auto; }
 </style>
 </head>
 <body>
+
+  <h1>El tiempo en San Jose</h1>
+
   <div class='header'>
     <div class='mini-card'>San Jose, US</div>
     <div class='mini-card'>Fecha: {{ fecha }}</div>
     <div class='mini-card'>Hora: <span id=\"reloj\">--:--:--</span></div>
   </div>
-
-  <h1>El Tiempo en San Jose</h1>
 
   <div class='card'><div class='dato'>Temperatura: {{ temperatura }} &#8451;</div></div>
   <div class='card'><div class='dato'>Humedad: {{ humedad }} %</div></div>
