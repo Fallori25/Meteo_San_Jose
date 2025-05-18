@@ -57,7 +57,7 @@ html_template = """
 <head>
 <title>El tiempo en San Jose</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<meta http-equiv='refresh' content='300'>
+<meta http-equiv='refresh' content='600'>
 <style>
 body { font-family: Arial, sans-serif; background-color: #FFB6C1; text-align: center; padding: 20px; margin: 0; }
 .header { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
@@ -200,4 +200,5 @@ def api_datos():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
