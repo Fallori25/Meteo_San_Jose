@@ -21,6 +21,38 @@ historial = []
 lat = 37.3382
 lon = -121.8863
 
+API_KEY = "9fbfb7854109d6c910f2d435052fb109"  # Reemplaza con tu API Key
+
+# Obtener pronóstico extendido
+iconos = {
+    "Clear": "☀️",
+    "Clouds": "☁️",
+    "Rain": "🌧️",
+    "Drizzle": "🌦️",
+    "Thunderstorm": "⛈️",
+    "Snow": "❄️",
+    "Mist": "🌫️"
+}
+
+def obtener_pronostico():
+    try:
+        url = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=current,minutely,hourly,alerts&units=metric&lang=es&appid={API_KEY}"
+        r = requests.get(url)
+        data = r.json()
+        dias = []
+        for i in range(1, 7):
+            d = data["daily"][i]
+            dt = datetime.fromtimestamp(d["dt"])
+            dia = dt.strftime("%A")
+            descripcion = d["weather"][0]["main"]
+            icono = iconos.get(descripcion, "🌡️")
+            max_temp = d["temp"]["max"]
+            min_temp = d["temp"]["min"]
+            dias.append(f"{icono} {dia} – {max_temp:.0f}°C / {min_temp:.0f}°C – {d['weather'][0]['description'].capitalize()}")
+        return dias
+    except:
+        return ["No se pudo obtener el pronóstico."]
+
 html_template = """
 <html>
 <head>
@@ -59,6 +91,11 @@ canvas { max-width: 100%; margin: 20px auto; }
 
   <h2>Gráfico de Presión</h2>
   <canvas id=\"graficoPres\"></canvas>
+
+  <h2>Pronóstico extendido</h2>
+  {% for dia in pronostico %}
+    <div class='card'><div class='dato'>{{ dia }}</div></div>
+  {% endfor %}
 
   <script src=\"https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js\"></script>
   <script>
@@ -125,7 +162,8 @@ def home():
                                   temperatura=datos["temperatura"],
                                   humedad=datos["humedad"],
                                   presion=datos["presion"],
-                                  fecha=datos["fecha"])
+                                  fecha=datos["fecha"],
+                                  pronostico=obtener_pronostico())
 
 @app.route("/update", methods=["POST"])
 def update():
@@ -167,6 +205,11 @@ def api_datos():
         "humedades": humedades,
         "presiones": presiones
     })
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
