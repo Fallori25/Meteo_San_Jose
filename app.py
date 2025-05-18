@@ -39,10 +39,10 @@ canvas { max-width: 100%; margin: 20px auto; }
 </head>
 <body>
   <div class='header'>
-  <div class='mini-card'>San Jose, US</div>
-  <div class='mini-card'>{{ fecha }}</div>
-  <div class='mini-card'><span id="reloj">--:--:--</span></div>
-</div>
+    <div class='mini-card'>San Jose, US</div>
+    <div class='mini-card'>Fecha: {{ fecha }}</div>
+    <div class='mini-card'>Hora: <span id=\"reloj\">--:--:--</span></div>
+  </div>
 
   <h1>Meteo_San_Jose</h1>
 
@@ -51,20 +51,20 @@ canvas { max-width: 100%; margin: 20px auto; }
   <div class='card'><div class='dato'>Presión: {{ presion }} hPa</div></div>
 
   <h2>Gráfico de Temperatura</h2>
-  <canvas id="graficoTemp"></canvas>
+  <canvas id=\"graficoTemp\"></canvas>
 
   <h2>Gráfico de Humedad</h2>
-  <canvas id="graficoHum"></canvas>
+  <canvas id=\"graficoHum\"></canvas>
 
   <h2>Gráfico de Presión</h2>
-  <canvas id="graficoPres"></canvas>
+  <canvas id=\"graficoPres\"></canvas>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+  <script src=\"https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js\"></script>
   <script>
     function actualizarReloj() {
       const ahora = new Date();
       const hora = ahora.toLocaleTimeString('es-AR', { hour12: false });
-      document.getElementById("reloj").textContent = hora;
+      document.getElementById(\"reloj\").textContent = hora;
     }
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
@@ -129,7 +129,7 @@ def home():
 @app.route("/update", methods=["POST"])
 def update():
     usa = pytz.timezone('America/Los_Angeles')
-    datos["fecha"] = datetime.now(usa).strftime("%d/%m/%Y %H:%M:%S")
+    datos["fecha"] = datetime.now(usa).strftime("%d/%m/%Y")
     try:
         temperatura = float(request.form.get("temperatura", "-"))
         humedad = float(request.form.get("humedad", "-"))
@@ -170,10 +170,3 @@ def api_datos():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
-
-
-
-
