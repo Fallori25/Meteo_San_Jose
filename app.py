@@ -6,21 +6,46 @@ import os
 
 app = Flask(__name__)
 
+# Coordenadas de San José, California
+lat = 37.3382
+lon = -121.8863
+
 # Variables actuales
 datos = {
     "temperatura": "-",
     "humedad": "-",
     "presion": "-",
     "fecha": "-",
-    "hora": "-"
+    "hora": "-",
+    "pronostico_html": "No se pudo obtener el pronóstico."
 }
 
 # Historial (últimos 36 para 3 horas cada 5 minutos)
 historial = []
 
-# Coordenadas de San José, California
-lat = 37.3382
-lon = -121.8863
+def obtener_pronostico():
+    try:
+        api_key = "9fbfb7854109d6c910f2d435052fb109"
+        url = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=current,minutely,hourly,alerts&units=metric&lang=es&appid={api_key}"
+        r = requests.get(url)
+        data = r.json()
+        dias = []
+        iconos = {
+            "Clear": "☀️", "Clouds": "☁️", "Rain": "🌧️", "Drizzle": "🌦️",
+            "Thunderstorm": "⛈️", "Snow": "❄️", "Mist": "🌫️"
+        }
+        for i in range(1, 7):
+            d = data["daily"][i]
+            dt = datetime.fromtimestamp(d["dt"])
+            dia = dt.strftime("%A")
+            descripcion = d["weather"][0]["main"]
+            icono = iconos.get(descripcion, "🌡️")
+            max_temp = d["temp"]["max"]
+            min_temp = d["temp"]["min"]
+            dias.append(f"{icono} {dia}: {max_temp:.0f}°C / {min_temp:.0f}°C - {d['weather'][0]['description'].capitalize()}")
+        return "<br>".join(dias)
+    except:
+        return "No se pudo obtener el pronóstico."
 
 html_template = """
 <html>
@@ -82,7 +107,7 @@ canvas {
 }
 </style>
 <script>
-  setInterval(() => window.location.reload(), 600000);  // Refresca cada 10 min (600,000 ms)
+  setInterval(() => window.location.reload(), 600000);  // Refresca cada 10 min
 </script>
 </head>
 <body>
@@ -193,7 +218,7 @@ def home():
                                   presion=datos["presion"],
                                   fecha=datos["fecha"],
                                   hora=datos["hora"],
-                                  pronostico=datos.get("pronostico_html", "No se pudo obtener el pronóstico."))
+                                  pronostico=datos["pronostico_html"])
 
 @app.route("/update", methods=["POST"])
 def update():
@@ -219,6 +244,8 @@ def update():
         historial.append(registro)
         if len(historial) > 36:
             historial.pop(0)
+
+        datos["pronostico_html"] = obtener_pronostico()
 
     except:
         datos["temperatura"] = datos["humedad"] = datos["presion"] = "-"
