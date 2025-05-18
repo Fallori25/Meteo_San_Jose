@@ -78,6 +78,97 @@ canvas { max-width: 100%; margin: 20px auto; }
               type: 'line',
               data: { labels: data.labels, datasets: [{ label: 'Temperatura (°C)', data: data.temperaturas, borderColor: 'red', backgroundColor: 'transparent', tension: 0.4 }] },
               options: { responsive: true, scales: { x: { display: true }, y: { display: true } } }
+            });
+          } else {
+            gTemp.data.labels = data.labels;
+            gTemp.data.datasets[0].data = data.temperaturas;
+            gTemp.update();
+          }
+
+          if (!gHum) {
+            gHum = new Chart(document.getElementById('graficoHum').getContext('2d'), {
+              type: 'line',
+              data: { labels: data.labels, datasets: [{ label: 'Humedad (%)', data: data.humedades, borderColor: 'blue', backgroundColor: 'transparent', tension: 0.4 }] },
+              options: { responsive: true, scales: { x: { display: true }, y: { display: true } } }
+            });
+          } else {
+            gHum.data.labels = data.labels;
+            gHum.data.datasets[0].data = data.humedades;
+            gHum.update();
+          }
+
+          if (!gPres) {
+            gPres = new Chart(document.getElementById('graficoPres').getContext('2d'), {
+              type: 'line',
+              data: { labels: data.labels, datasets: [{ label: 'Presión (hPa)', data: data.presiones, borderColor: 'green', backgroundColor: 'transparent', tension: 0.4 }] },
+              options: { responsive: true, scales: { x: { display: true }, y: { display: true } } }
+            });
+          } else {
+            gPres.data.labels = data.labels;
+            gPres.data.datasets[0].data = data.presiones;
+            gPres.update();
+          }
+        });
+    }
+    cargarGraficos();
+    setInterval(cargarGraficos, 300000);
+  </script>
+</body>
+</html>
+"""
+
+@app.route("/", methods=["GET"])
+def home():
+    return render_template_string(html_template,
+                                  temperatura=datos["temperatura"],
+                                  humedad=datos["humedad"],
+                                  presion=datos["presion"],
+                                  fecha=datos["fecha"])
+
+@app.route("/update", methods=["POST"])
+def update():
+    usa = pytz.timezone('America/Los_Angeles')
+    datos["fecha"] = datetime.now(usa).strftime("%d/%m/%Y %H:%M:%S")
+    try:
+        temperatura = float(request.form.get("temperatura", "-"))
+        humedad = float(request.form.get("humedad", "-"))
+        presion = float(request.form.get("presion", "-"))
+
+        datos["temperatura"] = f"{temperatura:.1f}"
+        datos["humedad"] = f"{humedad:.1f}"
+        datos["presion"] = f"{presion:.1f}"
+
+        registro = {
+            "hora": datetime.now(usa).strftime("%H:%M"),
+            "temperatura": temperatura,
+            "humedad": humedad,
+            "presion": presion
+        }
+        historial.append(registro)
+        if len(historial) > 36:
+            historial.pop(0)
+
+    except:
+        datos["temperatura"] = datos["humedad"] = datos["presion"] = "-"
+
+    return "OK"
+
+@app.route("/api/datos", methods=["GET"])
+def api_datos():
+    etiquetas = [r["hora"] for r in historial]
+    temperaturas = [r["temperatura"] for r in historial]
+    humedades = [r["humedad"] for r in historial]
+    presiones = [r["presion"] for r in historial]
+    return jsonify({
+        "labels": etiquetas,
+        "temperaturas": temperaturas,
+        "humedades": humedades,
+        "presiones": presiones
+    })
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 
 
