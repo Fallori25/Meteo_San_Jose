@@ -24,7 +24,7 @@ lon = -121.8863
 html_template = """
 <html>
 <head>
-<title>Meteo_San_Jose</title>
+<title>El Tiempo en San Jose</title>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <meta http-equiv='refresh' content='300'>
 <style>
@@ -44,7 +44,7 @@ canvas { max-width: 100%; margin: 20px auto; }
     <div class='mini-card'>Hora: <span id=\"reloj\">--:--:--</span></div>
   </div>
 
-  <h1>Meteo_San_Jose</h1>
+  <h1>El Tiempo en San Jose</h1>
 
   <div class='card'><div class='dato'>Temperatura: {{ temperatura }} &#8451;</div></div>
   <div class='card'><div class='dato'>Humedad: {{ humedad }} %</div></div>
