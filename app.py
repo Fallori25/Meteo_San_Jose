@@ -14,7 +14,7 @@ datos = {
     "fecha": "-"
 }
 
-# Historial (últimos 36 para 3 horas cada 5 minutos)
+# Historial (últimos 72 para 6 horas cada 10 minutos)
 historial = []
 
 # Coordenadas de San José, California
@@ -147,7 +147,7 @@ def update():
             "presion": presion
         }
         historial.append(registro)
-        if len(historial) > 36:
+        if len(historial) > 72:
             historial.pop(0)
 
     except:
